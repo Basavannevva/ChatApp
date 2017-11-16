@@ -14,11 +14,17 @@
 
 const firebaseConfig = {
   apiKey: "<your-api-key>",
+
   authDomain: "<your-auth-domain>",
+
   databaseURL: "<your-database-url>",
+
   storageBucket: "<your-storage-bucket>",
+
   projectId: "<your-Project-Id>",
+
   messagingSenderId: "<your-messagingSenderId>"
+  
 };
 
 # Initialize Firebase in your App.js
