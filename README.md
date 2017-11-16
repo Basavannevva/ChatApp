@@ -21,8 +21,7 @@ const firebaseConfig = {
   messagingSenderId: "<your-messagingSenderId>"
 };
 
-#in your App.js
-# Initialize Firebase
+# Initialize Firebase in your App.js
 import * as firebase from 'firebase';
 
 const firebaseConfig = {
