@@ -1,5 +1,5 @@
 # ChatApp
-Basic ChatApp Using Firebase
+#Basic ChatApp Using Firebase
 
 1. Authentication of User
 2. Login User
@@ -7,21 +7,31 @@ Basic ChatApp Using Firebase
 4. Create Group Chat from the users which are using the app
 5. Text chat
 
-
-installtion of package
+#installtion of package
 1. npm install firebase --save
 
-in your App.js
+# go to firebase console  Add Firebase to your web app  you will get values like this
 
-// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "<your-api-key>",
+  authDomain: "<your-auth-domain>",
+  databaseURL: "<your-database-url>",
+  storageBucket: "<your-storage-bucket>",
+  projectId: "<your-Project-Id>",
+  messagingSenderId: "<your-messagingSenderId>"
+};
 
+#in your App.js
+# Initialize Firebase
 import * as firebase from 'firebase';
 
 const firebaseConfig = {
   apiKey: "<your-api-key>",
   authDomain: "<your-auth-domain>",
   databaseURL: "<your-database-url>",
-  storageBucket: "<your-storage-bucket>",,
+  storageBucket: "<your-storage-bucket>",
+  projectId: "<your-Project-Id>",
+  messagingSenderId: "<your-messagingSenderId>"
 };
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
