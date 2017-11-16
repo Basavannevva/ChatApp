@@ -13,9 +13,6 @@ import { StackNavigator, NavigationActions } from "react-navigation";
 import firebase from "firebase";
 import _ from "lodash";
 import styles from "../styles/ContactListStyle";
-// import {
-//   AvatarHelper
-// } from "react-native-ui-lib";
 var contactlist = [];
 let selectedItem = [];
 const ds = new ListView.DataSource({
@@ -37,16 +34,17 @@ class ContactList extends Component {
     };
   }
 
-  //fetch the ContactList
+  //fetch the Contacts from firbase 
   componentWillMount() {
     this.setState({ loading: true });
+
+    //get the user details from the firebase who is using the app
     var UserRef = "/user";
     return firebase
       .database()
       .ref(UserRef)
       .once("value")
       .then(snapshot => {
-        // this.setState({ stores: snapshot.val() })
         listContactList = [];
         snapshot.forEach(child => {
           if (child.val().UID != firebase.auth().currentUser.uid) {
@@ -57,14 +55,14 @@ class ContactList extends Component {
               UserId: child.val().UID
             });
           }
-         else{
-        selectedUserStructure.push({
-        dispalyName: child.val().DisplayName,
-        Email: child.val().Email,
-        PhoneNo:child.val().PhoneNo,
-        UserId:  child.val().UID,
-      });
-         }
+          else {
+            selectedUserStructure.push({
+              dispalyName: child.val().DisplayName,
+              Email: child.val().Email,
+              PhoneNo: child.val().PhoneNo,
+              UserId: child.val().UID,
+            });
+          }
         });
         this.copyData = listContactList;
         let newArray = this.copyData.slice();
@@ -91,40 +89,41 @@ class ContactList extends Component {
       });
   }
 
+  //Create Group 
   createGroup = () => {
-    if(this.state.GroupName.length!= 0)
-      {
-    this.setState({ loading: true });
-    const min = 1;
-    const max = 1000;
-    const rand = Math.random()
-      .toString(36)
-      .substr(2, 16);
-    const GroupId = "GRP" + rand;
+    if (this.state.GroupName.length != 0) {
+      this.setState({ loading: true });
+      const min = 1;
+      const max = 1000;
+      const rand = Math.random()
+        .toString(36)
+        .substr(2, 16);
+      const GroupId = "GRP" + rand;
 
-    const Group = {};
-    const groupInfo = {};
-    groupInfo.name = this.state.GroupName.charAt(0).toUpperCase() + this.state.GroupName.slice(1);
-    groupInfo.admin = firebase.auth().currentUser.uid;
-    Group.groupInfo = groupInfo;
-    Group.groupmembers = selectedUserStructure;
-    Group.GID = GroupId;
+      const Group = {};
+      const groupInfo = {};
+      groupInfo.name = this.state.GroupName.charAt(0).toUpperCase() + this.state.GroupName.slice(1);
+      groupInfo.admin = firebase.auth().currentUser.uid;
+      Group.groupInfo = groupInfo;
+      Group.groupmembers = selectedUserStructure;
+      Group.GID = GroupId;
 
-    let GroupPath = "/group/" + GroupId;
-    return firebase
-      .database()
-      .ref(GroupPath)
-      .set(Group)
-      .then(result => this.creategroupForUsers(GroupId, (this.state.GroupName.charAt(0).toUpperCase() + this.state.GroupName.slice(1))))
-      .catch(error => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        alert(errorMessage);
-        this.setState({ loading: false });
-      });
-      }
+      let GroupPath = "/group/" + GroupId;
+      return firebase
+        .database()
+        .ref(GroupPath)
+        .set(Group)
+        .then(result => this.creategroupForUsers(GroupId, (this.state.GroupName.charAt(0).toUpperCase() + this.state.GroupName.slice(1))))
+        .catch(error => {
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          alert(errorMessage);
+          this.setState({ loading: false });
+        });
+    }
   };
 
+  //add group to user who involved
   creategroupForUsers(GroupId, Name) {
     var { navigate } = this.props.navigation;
     for (const k = 0; k < selectedUserStructure.length; k++) {
@@ -145,6 +144,7 @@ class ContactList extends Component {
     navigate("Home", {});
   }
 
+  //on click add the user to list
   clickMark(row, id) {
     let index = Number(id);
     var clickedindex = "";
@@ -184,7 +184,6 @@ class ContactList extends Component {
       ? styles.circleViewSelected
       : styles.circleView;
     const textColor = row.isSelected ? "#ffffff" : "#000000";
-    // const initials = AvatarHelper.getInitials(row.dispalyName);
 
     return (
       <TouchableOpacity
@@ -197,8 +196,7 @@ class ContactList extends Component {
           backgroundColor: "#dddddd",
           borderRadius: 3
         }}
-        onPress={this.clickMark.bind(this, row, id)}
-      >
+        onPress={this.clickMark.bind(this, row, id)}>
         <View style={styles.slideInputWrapper}>
           <View style={styleCircular}>
             <Text style={{ color: textColor }}>
@@ -230,7 +228,7 @@ class ContactList extends Component {
     } else {
       return (
         <View style={{ flex: 1 }}>
-         <StatusBar backgroundColor="#212733" barStyle="light-content"/>
+          <StatusBar backgroundColor="#212733" barStyle="light-content" />
           <View style={styles.headerView}>
             <View style={styles.headerContainer}>
               <View style={styles.headerSubContainer}>
@@ -247,7 +245,7 @@ class ContactList extends Component {
                 <Text style={styles.headerTxt}> Home</Text>
               </View>
               <TouchableOpacity
-              onPress={this.createGroup}>
+                onPress={this.createGroup}>
                 <Image
                   style={styles.plusImg}
                   source={require("../image/done.png")}
@@ -269,16 +267,7 @@ class ContactList extends Component {
           <Text style={styles.textSubHeaderstyle}>Contacts</Text>
           <ListView
             dataSource={this.state.dataSource}
-            renderRow={(row, sectionId, rowId) => this.renderRow(row, rowId)}
-          />
-{/* 
-          <TouchableOpacity
-            style={styles.Buttonstyle}
-            onPress={this.createGroup}
-            underlayColor="red"
-          >
-            <Text style={styles.textstyle}>Create Group</Text>
-          </TouchableOpacity> */}
+            renderRow={(row, sectionId, rowId) => this.renderRow(row, rowId)} />
         </View>
       );
     }

@@ -9,6 +9,7 @@ class App extends Component {
 
  componentWillMount() {
 
+  //Initialize the firebase Values
   var fireBaseconfig = {
     apiKey: "AIzaSyCv3c1YjGUVZ2NivTCT7_BhN5vee-4i01Y",
     authDomain: "xelpchat-ef805.firebaseapp.com",
@@ -16,8 +17,8 @@ class App extends Component {
     storageBucket: "xelpchat-ef805.appspot.com",
     messagingSenderId: "960763794729"
   };
-  // firebase.initializeApp(fireBaseconfig);
   firebase.initializeApp(fireBaseconfig);
+  
   console.disableYellowBox = true;
   }
 render() {

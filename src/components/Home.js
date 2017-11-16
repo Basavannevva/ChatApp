@@ -31,6 +31,8 @@ class Home extends Component {
 
     componentWillMount() {
         this.setState({ loading: true });
+
+        //Check the user groups which he involved
         var groupRef = "/user/" + firebase.auth().currentUser.uid + "/group";
         return firebase
             .database()
@@ -48,11 +50,13 @@ class Home extends Component {
             })
     }
 
+    //create Grouplist
     goToContactList() {
         var { navigate } = this.props.navigation;
         navigate("ContactList", {});
     }
 
+    //Go to Chat
     goToChat(row) {
         var { navigate } = this.props.navigation;
         navigate("Chat", { chatDetails: row });
@@ -60,17 +64,17 @@ class Home extends Component {
 
     renderRow(row, id) {
         return (
-            <TouchableOpacity 
-        style={{
-          justifyContent: "center",
-          marginLeft: 15,
-          marginRight: 15,
-          marginTop: 5,
-          padding: 5,
-          backgroundColor: "#dddddd",
-          borderRadius: 3
-        }}
-      onPress={this.goToChat.bind(this, row)}>
+            <TouchableOpacity
+                style={{
+                    justifyContent: "center",
+                    marginLeft: 15,
+                    marginRight: 15,
+                    marginTop: 5,
+                    padding: 5,
+                    backgroundColor: "#dddddd",
+                    borderRadius: 3
+                }}
+                onPress={this.goToChat.bind(this, row)}>
                 <View>
                     <Text style={AddUserStyle.textstyle}>{row.GroupName}</Text>
                 </View>
@@ -88,7 +92,7 @@ class Home extends Component {
         else {
             return (
                 <View style={AddUserStyle.container}>
-                 <StatusBar backgroundColor="#212733" barStyle="light-content"/>
+                    <StatusBar backgroundColor="#212733" barStyle="light-content" />
                     <View style={AddUserStyle.headerBackground}>
                         <View style={AddUserStyle.headerContainer}>
                             <Text style={AddUserStyle.headerTxt}> Home</Text>
@@ -100,13 +104,6 @@ class Home extends Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    {/* <TouchableOpacity
-                    style={AddUserStyle.Buttonstyle} 
-                    onPress={this.goToContactList.bind(this)}
-                    underlayColor="red">
-                    <Text style={AddUserStyle.textstyle}>Create Group</Text>
-                </TouchableOpacity> */}
-
                     <ListView
                         style={{
                             marginTop: 10,

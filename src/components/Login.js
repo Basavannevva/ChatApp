@@ -33,14 +33,11 @@ class Login extends Component {
     };
 
 
+    //check the user is Login or not if login go to Home Screen
     componentWillMount() {
-
         firebase.auth().onAuthStateChanged(user => {
-
             if (user) {
                 this.setState({ loginStatus: true });
-                //   var { navigate } = this.props.navigation;
-                //   navigate("Home", {})
                 this.props.navigation.dispatch(ResetLogin);
             }
             else {
@@ -58,12 +55,14 @@ class Login extends Component {
         var { navigate } = this.props.navigation;
         let email = this.state.email;
         let password = this.state.password;
+
+        //user SignIn with Email And Password
         firebase.auth()
             .signInWithEmailAndPassword(email, password).then((userData) => {
                 this.setState({
                     loading: false
                 });
-                 this.props.navigation.dispatch(ResetLogin);
+                this.props.navigation.dispatch(ResetLogin);
             })
             .catch(error => {
                 this.setState({
@@ -85,7 +84,7 @@ class Login extends Component {
         if (this.state.loading) {
             return (
                 <View
-                  style={AddUserStyle.Buttonstyle}>
+                    style={AddUserStyle.Buttonstyle}>
                     <ActivityIndicator />
                 </View>
             );
@@ -131,7 +130,6 @@ class Login extends Component {
                         <Text style={AddUserStyle.textSignUpstyle}>Are you New User? SignUp Here.</Text>
                     </TouchableOpacity>
 
-                    {/* <TouchableOpacity onPress={this.SignUpUser} underlayColor="red"> <Text style={AddUserStyle.textHeaderstyle}> Sign Up Here </Text></TouchableOpacity> */}
                 </View>
             );
         }

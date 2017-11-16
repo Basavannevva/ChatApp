@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, ListView, Image,StatusBar,Keyboard } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, ListView, Image, StatusBar, Keyboard } from 'react-native';
 import styles from "../styles/ChatStyle"
 import firebase from 'firebase';
 import moment from "moment"
 import { StackNavigator, NavigationActions } from "react-navigation";
-import { clearText,updateText } from "../action/chatList.action"
+import { clearText, updateText } from "../action/chatList.action"
 import { connect } from "react-redux";
 const ds = new ListView.DataSource({
     rowHasChanged: (r1, r2) => r1.id !== r2.id
@@ -17,18 +17,16 @@ class Chat extends Component {
         headerTintColor: "white",
         headerStyle: { backgroundColor: "#212733" },
         headerTitleStyle: { color: "#FFFFFF" }
-      };
-  
-
+    };
 
     constructor(props) {
         super(props);
-    var yourTextInputRef;
+        var yourTextInputRef;
         this.state = {
             dataSource: ds.cloneWithRows(listMessages),
             loading: false,
             message: '',
-            displayName:'',
+            displayName: '',
 
         };
     }
@@ -36,123 +34,108 @@ class Chat extends Component {
     componentWillMount() {
         const { params } = this.props.navigation.state;
         this.setState({ loading: true })
-        
 
+        //get the username of the logedin user
         var UserRef = '/user/' + firebase.auth().currentUser.uid;
-         firebase.database().ref(UserRef).once('value').then(snapshot => {
-              snapshot.forEach((child) => {
-                  if(child.key == 'DisplayName')
-                    {
-                   this.setState({ displayName: child.val()})
-                    }
+        firebase.database().ref(UserRef).once('value').then(snapshot => {
+            snapshot.forEach((child) => {
+                if (child.key == 'DisplayName') {
+                    this.setState({ displayName: child.val() })
+                }
             });
-       
-          }).catch(
+        }).catch( )
 
-          )
-
-
+        //get the message from the firebase
         var chatRef = '/message/' + params.chatDetails.GroupId;
         return firebase.database().ref(chatRef).on('value', snapshot => {
-           listMessages = [];
+            listMessages = [];
             snapshot.forEach((child) => {
                 listMessages.push({
                     MessageText: child.val().text,
                     senderId: child.val().idSender,
                     receiverId: child.val().idReceiver,
                     timeStamp: child.val().timestamp,
-                    name:child.val().displayName
+                    name: child.val().displayName
                 });
             });
 
             this.setState({ dataSource: ds.cloneWithRows(listMessages) });
 
         })
-
-       
-      
-
     }
 
-    goToContactList() {
-        var { navigate } = this.props.navigation;
-        navigate("ContactList", {})
-    }
-
+    //add Messages to firbase on Click of send button
     addMessagetoChat() {
-        if(this.props.messagedText.length !=0)
-         {
-        this.input.clear();
-        var MsgText=this.props.messagedText;
-        Keyboard.dismiss(); 
-         this.props.clearText('');
-        const { params } = this.props.navigation.state;
-        const idreceiver = params.chatDetails.GroupId;
-        var currentDate = new Date();
-        var timeinMilliSec = currentDate.getTime();
-        const msgId = 'Msg' + timeinMilliSec
+        if (this.props.messagedText.length != 0) {
+            this.input.clear();
+            var MsgText = this.props.messagedText;
+            Keyboard.dismiss();
+            this.props.clearText('');
+            const { params } = this.props.navigation.state;
+            const idreceiver = params.chatDetails.GroupId;
+            var currentDate = new Date();
+            var timeinMilliSec = currentDate.getTime();
+            const msgId = 'Msg' + timeinMilliSec
 
-        const Messages = {};
+            const Messages = {};
+            Messages.text = MsgText;
+            Messages.idSender = firebase.auth().currentUser.uid;
+            Messages.idReceiver = idreceiver;
+            Messages.timestamp = timeinMilliSec;
+            Messages.displayName = this.state.displayName;
 
-        Messages.text = MsgText;
-        Messages.idSender = firebase.auth().currentUser.uid;
-        Messages.idReceiver = idreceiver;
-        Messages.timestamp = timeinMilliSec;
-        Messages.displayName=this.state.displayName;
-
-        let MessagePath = '/message/' + params.chatDetails.GroupId+ "/" + msgId;
-        return firebase.database().ref(MessagePath).set(Messages).then(result => this.updateList(result))
-            .catch(error => {
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                alert(errorMessage);
-            });
+            //add messages to firebase
+            let MessagePath = '/message/' + params.chatDetails.GroupId + "/" + msgId;
+            return firebase.database().ref(MessagePath).set(Messages).then(result => this.updateList(result))
+                .catch(error => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    alert(errorMessage);
+                });
         }
     }
 
     updateList(result) {
-     this.props.clearText('')
+        this.props.clearText('')
     }
 
-    convertTimeStampToDate(timestamp)
-    {
-       var formatted = moment(timestamp, "x").format("DD MMM hh:mm a");
-       return formatted
+    //Convert the timestamp to formatted date time
+    convertTimeStampToDate(timestamp) {
+        var formatted = moment(timestamp, "x").format("DD MMM hh:mm a");
+        return formatted
     }
+
     renderRow(row, id) {
-        if(row.senderId == firebase.auth().currentUser.uid)
-            {
-        return (
-             <View style={styles.msgRightStyle}>
-                 <View style={styles.emailLabel}>
-                    <Text style={styles.dispalyNameTextStyle}>{row.name}</Text>
-                     <Text style={styles.MessageTextStyle}>{row.MessageText}</Text>
-                      <Text style={styles.DateTimeStyle}>{this.convertTimeStampToDate(row.timeStamp)}</Text>
+        if (row.senderId == firebase.auth().currentUser.uid) {
+            return (
+                <View style={styles.msgRightStyle}>
+                    <View style={styles.emailLabel}>
+                        <Text style={styles.dispalyNameTextStyle}>{row.name}</Text>
+                        <Text style={styles.MessageTextStyle}>{row.MessageText}</Text>
+                        <Text style={styles.DateTimeStyle}>{this.convertTimeStampToDate(row.timeStamp)}</Text>
                     </View>
                 </View>
-        );
-            }
-    else{
-        return(
-      <View style={styles.msgLeftStyle}>
-          
-           <View style={styles.msgLeftTextStyle}>
-                    <Text style={styles.dispalyNameTextStyle}>{row.name}</Text>
-                     <Text style={styles.MessageTextStyle}>{row.MessageText}</Text>
-                      <Text style={styles.DateTimeStyle}>{this.convertTimeStampToDate(row.timeStamp)}</Text>
+            );
+        }
+        else {
+            return (
+                <View style={styles.msgLeftStyle}>
+
+                    <View style={styles.msgLeftTextStyle}>
+                        <Text style={styles.dispalyNameTextStyle}>{row.name}</Text>
+                        <Text style={styles.MessageTextStyle}>{row.MessageText}</Text>
+                        <Text style={styles.DateTimeStyle}>{this.convertTimeStampToDate(row.timeStamp)}</Text>
                     </View>
 
                 </View>
-        );
+            );
+        }
     }
-    }
-
-
 
     render() {
         return (
             <View style={styles.container}>
-            <StatusBar backgroundColor="#212733" barStyle="light-content"/>
+                <StatusBar backgroundColor="#212733" barStyle="light-content" />
                 <ListView
                     style={{
                         marginTop: 10,
@@ -162,36 +145,33 @@ class Chat extends Component {
                     renderRow={(row, sectionId, rowId) => this.renderRow(row, rowId)}
                 />
                 <View style={styles.SendWrapper}>
-
                     <TextInput
                         style={styles.InputStyle}
                         ref={(input) => this.input = input}
                         onChangeText={text => this.props.updateText(text)}
                         placeholderTextColor='#dddddd'
                         underlineColorAndroid='transparent'
-                     
+
                     />
                     <View style={styles.sendButtonStyle}>
-                    <TouchableOpacity   onPress={this.addMessagetoChat.bind(this)}>
-                        <Image
-                            style={styles.ImageStyle}
-                            source={require("../image/send_message_button.png")}
-                        />
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={this.addMessagetoChat.bind(this)}>
+                            <Image
+                                style={styles.ImageStyle}
+                                source={require("../image/send_message_button.png")}
+                            />
+                        </TouchableOpacity>
                     </View>
-                    </View>
+                </View>
             </View>);
-
-
     }
 }
 
 const mapStateToProps = state => {
-  return {
-  messagedText: state.chatList.messagedText
-  };
+    return {
+        messagedText: state.chatList.messagedText
+    };
 };
 
 export default connect(mapStateToProps, {
-clearText,updateText
+    clearText, updateText
 })(Chat);
